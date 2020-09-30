@@ -4,12 +4,14 @@ import (
 	"context"
 	"flag"
 	"fmt"
+	"net/http"
 	"os"
 	"strings"
 	"sync"
 	"time"
 
 	"github.com/kelseyhightower/envconfig"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/submariner-io/admiral/pkg/log"
 	subv1 "github.com/submariner-io/submariner/pkg/apis/submariner.io/v1"
 	"github.com/submariner-io/submariner/pkg/cable"
@@ -67,6 +69,9 @@ func main() {
 	flag.Parse()
 
 	klog.Info("Starting the submariner gateway engine")
+
+	http.Handle("/metrics", promhttp.Handler())
+	panic(http.ListenAndServe(":8080", nil))
 
 	// set up signals so we handle the first shutdown signal gracefully
 	stopCh := signals.SetupSignalHandler()
